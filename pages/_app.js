@@ -5,6 +5,16 @@ import { baseSepolia, sepolia } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit";
 
+import { HuddleClient, HuddleProvider } from "@huddle01/react";
+
+const huddleClient = new HuddleClient({
+ projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+ options: {
+   activeSpeakers: {
+     size: 12,
+   },
+ },
+});
 
 const theme = extendBaseTheme({
     styles: {
@@ -43,7 +53,9 @@ export default function App({ Component, pageProps }) {
                 <QueryClientProvider client={queryClient}>
                     <ConnectKitProvider>
                         <ChakraProvider theme={theme}>
+                          <HuddleProvider client={huddleClient}>
                             <Component {...pageProps} />
+                          </HuddleProvider>
                         </ChakraProvider>
                     </ConnectKitProvider>
                 </QueryClientProvider>

@@ -185,7 +185,7 @@ export default function Publish() {
                                         </FormControl>
                                         <FormControl className="flex-1">
                                             <FormLabel>
-                                                Flow Rate(matic/hour)
+                                                Flow Rate(Eth/Hour)
                                             </FormLabel>
                                             <NumberInput
                                                 value={formInput.stringFlowRate}
@@ -203,7 +203,7 @@ export default function Publish() {
                                                     px={2}
                                                     color={"black"}
                                                     name="flowrate"
-                                                    placeholder="matic/hour"
+                                                    placeholder="eth/hour"
                                                     required
                                                 />
                                                 <NumberInputStepper>

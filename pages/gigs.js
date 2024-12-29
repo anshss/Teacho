@@ -4,7 +4,6 @@ import web3modal from "web3modal";
 import { address, abi } from "../config.js";
 import styles from "../styles/style";
 import { Navbar } from "../components";
-import { getEthersProvider } from "@/functions";
 
 export default function Gigs() {
     const [gigs, setGigs] = useState([]);
@@ -15,7 +14,7 @@ export default function Gigs() {
 
 
     async function fetchAllGigs() {
-        const provider = await getEthersProvider();
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
         const contract = new ethers.Contract(address, abi, provider);
         const data = await contract.listGigs();
         const itemsFetched = await Promise.all(
@@ -90,7 +89,7 @@ export default function Gigs() {
                                 <p className="mt-3 text-gray-500">Date: {getDateStandard(dateTime)}</p>
                             </div>
                             <div className="flex flex-1 justify-center items-end flex-col">
-                                <p >Price: {prop.stringFlowRate} Matic/Hour</p>
+                                <p >Price: {prop.stringFlowRate} Eth/Hour</p>
                                 <button
                                     type="button"
                                     onClick={() => buy(prop)}

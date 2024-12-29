@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { Framework } from "@superfluid-finance/sdk-core";
+// import { Framework } from "@superfluid-finance/sdk-core";
 import { ethers } from "ethers";
-import web3modal from "web3modal";
-import { address, abi } from "../config.js";
+// import web3modal from "web3modal";
+import { address, abi, forwarderAddress, forwarderABI, superTokenAddress } from "../config.js";
 import styles from "../styles/style";
 import { Navbar } from "../components";
 import { useHuddle01, useEventListener } from "@huddle01/react";
@@ -90,7 +90,7 @@ export default function MyClasses() {
             videoRef.current.srcObject = camStream;
     });
 
-    const superTokenAddress = `0x96B82B65ACF7072eFEb00502F45757F254c2a0D4`;
+    
     const [superToken, setSuperToken] = useState();
     const [gigs, setGigs] = useState([]);
     const [userAddress, setUserAddress] = useState();
@@ -110,40 +110,28 @@ export default function MyClasses() {
     }
 
     useEffect(() => {
-        sfInitialize();
+        // sfInitialize();
         fetchUserAddress();
         fetchMyClasses();
         initialize("KL1r3E1yHfcrRbXsT4mcE-3mK60Yc3YR");
     }, []);
 
-    async function getEthersProvider() {
-        const infuraKey = process.env.NEXT_PUBLIC_INFURA_KEY;
-        const provider = new ethers.providers.JsonRpcProvider(
-            `https://polygon-mumbai.infura.io/v3/${infuraKey}`
-        );
-        return provider;
-    }
+    // async function sfInitialize() {
+    //     const provider = new ethers.providers.Web3Provider(window.ethereum);
+    //     const xsf = await Framework.create({
+    //         chainId: 84532,
+    //         provider,
+    //         resolverAddress: "0xcfA132E353cB4E398080B9700609bb008eceB125" // same for all chains
+    //     });
+    //     const sT = await xsf.loadSuperToken(superTokenAddress);
+    //     setSuperToken(sT);
 
-    async function sfInitialize() {
-        const provider = await getEthersProvider();
-        const xsf = await Framework.create({
-            chainId: 80001,
-            provider,
-        });
-        const sT = await xsf.loadSuperToken(superTokenAddress);
-        setSuperToken(sT);
-
-        console.log("ready");
-        return sT;
-    }
+    //     console.log("ready");
+    //     return sT;
+    // }
 
     async function fetchUserAddress() {
-        const modal = new web3modal({
-            network: "mumbai",
-            cacheProvider: true,
-        });
-        const connection = await modal.connect();
-        const provider = new ethers.providers.Web3Provider(connection);
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
         let accounts = await provider.send("eth_requestAccounts", []);
         let senderAddress = accounts[0];
         setUserAddress(senderAddress);
@@ -151,8 +139,9 @@ export default function MyClasses() {
     }
 
     async function fetchMyClasses() {
-        const provider = await getEthersProvider();
-        const senderAddress = await fetchUserAddress();
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        let accounts = await provider.send("eth_requestAccounts", []);
+        let senderAddress = accounts[0];
         const contract = new ethers.Contract(address, abi, provider);
         const data = await contract.myClasses(senderAddress);
         const itemsFetched = await Promise.all(
@@ -187,25 +176,30 @@ export default function MyClasses() {
         if (senderAddress.toUpperCase() == xReceiverAddress.toUpperCase()) return
         console.log(senderAddress, xReceiverAddress, xFlowRate);
 
-        const xSuperToken = await sfInitialize();
+        // const xSuperToken = await sfInitialize();
 
-        const modal = new web3modal({
-            network: "mumbai",
-            cacheProvider: true,
-        });
-        const connection = await modal.connect();
-        const provider = new ethers.providers.Web3Provider(connection);
-        const signer = provider.getSigner();
+        // const modal = new web3modal({
+        //     network: "mumbai",
+        //     cacheProvider: true,
+        // });
+        // const connection = await modal.connect();
+        // const provider = new ethers.providers.Web3Provider(connection);
+        // const signer = provider.getSigner();
 
-        const createFlowOperation = xSuperToken.createFlow({
-            sender: senderAddress,
-            receiver: xReceiverAddress,
-            flowRate: xFlowRate,
-        });
+        const forwarderContract = new ethers.Contract(forwarderAddress, forwarderABI, provider.getSigner());
+
+        const createFlowOperation = forwarderContract.createFlow(
+            superTokenAddress,
+            senderAddress,
+            xReceiverAddress,
+            xFlowRate,
+            "0x"
+        );
 
         const txnResponse = await createFlowOperation.exec(signer);
         const txnReceipt = await txnResponse.wait();
         console.log("started");
+        console.log(txnReceipt)
         console.log(
             `https://app.superfluid.finance/dashboard/${xReceiverAddress}`
         );
@@ -215,18 +209,22 @@ export default function MyClasses() {
 
         if (userAddress?.toUpperCase() == xReceiverAddress?.toUpperCase()) return
 
-        const modal = new web3modal({
-            network: "mumbai",
-            cacheProvider: true,
-        });
-        const connection = await modal.connect();
-        const provider = new ethers.providers.Web3Provider(connection);
-        const signer = provider.getSigner();
+        // const modal = new web3modal({
+        //     network: "mumbai",
+        //     cacheProvider: true,
+        // });
+        // const connection = await modal.connect();
+        // const provider = new ethers.providers.Web3Provider(connection);
+        // const signer = provider.getSigner();
 
-        const flowOp = superToken.deleteFlow({
-            sender: userAddress,
-            receiver: xReceiverAddress,
-        });
+        const forwarderContract = new ethers.Contract(forwarderAddress, forwarderABI, provider.getSigner());
+
+        const flowOp = forwarderContract.deleteFlow(
+            superTokenAddress,
+            userAddress,
+            xReceiverAddress,
+            "0x"
+        );
 
         const txnResponse = await flowOp.exec(signer);
         const txnReceipt = await txnResponse.wait();
@@ -234,7 +232,7 @@ export default function MyClasses() {
     }
 
     async function getFlowInfo(xReceiverAddress) {
-        const provider = await getEthersProvider();
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
         if (userAddress == xReceiverAddress) return
         
         const flowInfo = await superToken.getFlow({
@@ -278,7 +276,7 @@ export default function MyClasses() {
                                 </div>
                                 <div className="flex flex-1 justify-center items-end flex-col">
                                     <p className="mr-6">
-                                        Price: {prop.stringFlowRate} Matic/Hour
+                                        Price: {prop.stringFlowRate} Eth/Hour
                                     </p>
                                     <button
                                         type="button"

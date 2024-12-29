@@ -1,26 +1,32 @@
-import { ParticleNetwork, WalletEntryPosition } from "@particle-network/auth";
+// import { ParticleNetwork, WalletEntryPosition } from "@particle-network/auth";
 
-export const address = `0x4F500C52fcFE3f640929B254d4294cdC9740aDE1`
+// export const pn = new ParticleNetwork({
+	// 	projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+	// 	clientKey: process.env.NEXT_PUBLIC_CLIENT_KEY,
+	// 	appId: process.env.NEXT_PUBLIC_APP_ID,
+	// 	chainName: "polygon", 
+	// 	chainId: 80001, 
+	// 	// chainName: "bsc", 
+	// 	// chainId: 97, 
+	// 	wallet: {
+		// 		//optional: by default, the wallet entry is displayed in the bottom right corner of the webpage.
+		// 		displayWalletEntry: true, //show wallet entry when connect particle.
+		// 		defaultWalletEntryPosition: WalletEntryPosition.BR, //wallet entry position
+		// 		uiMode: "dark", //optional: light or dark, if not set, the default is the same as web auth.
+		// 		supportChains: [{ id: 1, name: "Ethereum" }, {id: 97, name: "bsc"}], // optional: web wallet support chains.
+		// 		customStyle: {}, //optional: custom wallet style
+		// 	},
+		// });
+		
+export const address = `0xF8E9F063228eb47137101eb863BF3976466AA31F`
 
+export const forwarderAddress = `0xcfA132E353cB4E398080B9700609bb008eceB125`
 
-export const pn = new ParticleNetwork({
-	projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
-	clientKey: process.env.NEXT_PUBLIC_CLIENT_KEY,
-	appId: process.env.NEXT_PUBLIC_APP_ID,
-	chainName: "polygon", 
-	chainId: 80001, 
-	// chainName: "bsc", 
-	// chainId: 97, 
-	wallet: {
-		//optional: by default, the wallet entry is displayed in the bottom right corner of the webpage.
-		displayWalletEntry: true, //show wallet entry when connect particle.
-		defaultWalletEntryPosition: WalletEntryPosition.BR, //wallet entry position
-		uiMode: "dark", //optional: light or dark, if not set, the default is the same as web auth.
-		supportChains: [{ id: 1, name: "Ethereum" }, {id: 97, name: "bsc"}], // optional: web wallet support chains.
-		customStyle: {}, //optional: custom wallet style
-	},
-});
+export const superTokenAddress = `0x143ea239159155B408e71CDbE836e8CFD6766732`;
 
+export const forwarderABI = `
+function createFlow(address token, address sender, address receiver, int96 flowRate, bytes memory userData) external returns (bool)
+`;
 
 export const abi = `[
 	{

@@ -13,13 +13,6 @@ export default function Gigs() {
         fetchAllGigs()
     }, []);
 
-    // async function getEthersProvider() {
-    //     const infuraKey = process.env.NEXT_PUBLIC_INFURA_KEY;
-    //     const provider = new ethers.providers.JsonRpcProvider(
-    //         `https://polygon-mumbai.infura.io/v3/${infuraKey}`
-    //     );
-    //     return provider;
-    // }
 
     async function fetchAllGigs() {
         const provider = await getEthersProvider();

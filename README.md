@@ -10,5 +10,5 @@ If multiple people buy a course from the same lecturer, they will be minted with
 <br />
 [Demo Video](https://youtu.be/88_QtgqihZU)
 <br />
-[Contract Info](https://mumbai.polygonscan.com/address/0x4F500C52fcFE3f640929B254d4294cdC9740aDE1)
+[Contract Info](https://sepolia.base.com/address/0xF8E9F063228eb47137101eb863BF3976466AA31F)
 

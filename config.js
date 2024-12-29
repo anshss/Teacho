@@ -1,31 +1,256 @@
-// import { ParticleNetwork, WalletEntryPosition } from "@particle-network/auth";
+export const address = `0xF8E9F063228eb47137101eb863BF3976466AA31F`;
 
-// export const pn = new ParticleNetwork({
-	// 	projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
-	// 	clientKey: process.env.NEXT_PUBLIC_CLIENT_KEY,
-	// 	appId: process.env.NEXT_PUBLIC_APP_ID,
-	// 	chainName: "polygon", 
-	// 	chainId: 80001, 
-	// 	// chainName: "bsc", 
-	// 	// chainId: 97, 
-	// 	wallet: {
-		// 		//optional: by default, the wallet entry is displayed in the bottom right corner of the webpage.
-		// 		displayWalletEntry: true, //show wallet entry when connect particle.
-		// 		defaultWalletEntryPosition: WalletEntryPosition.BR, //wallet entry position
-		// 		uiMode: "dark", //optional: light or dark, if not set, the default is the same as web auth.
-		// 		supportChains: [{ id: 1, name: "Ethereum" }, {id: 97, name: "bsc"}], // optional: web wallet support chains.
-		// 		customStyle: {}, //optional: custom wallet style
-		// 	},
-		// });
-		
-export const address = `0xF8E9F063228eb47137101eb863BF3976466AA31F`
-
-export const forwarderAddress = `0xcfA132E353cB4E398080B9700609bb008eceB125`
+export const forwarderAddress = `0xcfA132E353cB4E398080B9700609bb008eceB125`;
 
 export const superTokenAddress = `0x143ea239159155B408e71CDbE836e8CFD6766732`;
 
 export const forwarderABI = `
-function createFlow(address token, address sender, address receiver, int96 flowRate, bytes memory userData) external returns (bool)
+[
+  {
+    "inputs": [
+      {
+        "internalType": "contract ISuperfluid",
+        "name": "host",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  { "inputs": [], "name": "CFA_FWD_INVALID_FLOW_RATE", "type": "error" },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ISuperToken",
+        "name": "token",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "sender", "type": "address" },
+      { "internalType": "address", "name": "receiver", "type": "address" },
+      { "internalType": "int96", "name": "flowrate", "type": "int96" },
+      { "internalType": "bytes", "name": "userData", "type": "bytes" }
+    ],
+    "name": "createFlow",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ISuperToken",
+        "name": "token",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "sender", "type": "address" },
+      { "internalType": "address", "name": "receiver", "type": "address" },
+      { "internalType": "bytes", "name": "userData", "type": "bytes" }
+    ],
+    "name": "deleteFlow",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ISuperToken",
+        "name": "token",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
+    "name": "getAccountFlowInfo",
+    "outputs": [
+      { "internalType": "uint256", "name": "lastUpdated", "type": "uint256" },
+      { "internalType": "int96", "name": "flowrate", "type": "int96" },
+      { "internalType": "uint256", "name": "deposit", "type": "uint256" },
+      { "internalType": "uint256", "name": "owedDeposit", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ISuperToken",
+        "name": "token",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
+    "name": "getAccountFlowrate",
+    "outputs": [
+      { "internalType": "int96", "name": "flowrate", "type": "int96" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ISuperToken",
+        "name": "token",
+        "type": "address"
+      },
+      { "internalType": "int96", "name": "flowrate", "type": "int96" }
+    ],
+    "name": "getBufferAmountByFlowrate",
+    "outputs": [
+      { "internalType": "uint256", "name": "bufferAmount", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ISuperToken",
+        "name": "token",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "sender", "type": "address" },
+      { "internalType": "address", "name": "receiver", "type": "address" }
+    ],
+    "name": "getFlowInfo",
+    "outputs": [
+      { "internalType": "uint256", "name": "lastUpdated", "type": "uint256" },
+      { "internalType": "int96", "name": "flowrate", "type": "int96" },
+      { "internalType": "uint256", "name": "deposit", "type": "uint256" },
+      { "internalType": "uint256", "name": "owedDeposit", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ISuperToken",
+        "name": "token",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "sender", "type": "address" },
+      { "internalType": "address", "name": "flowOperator", "type": "address" }
+    ],
+    "name": "getFlowOperatorPermissions",
+    "outputs": [
+      { "internalType": "uint8", "name": "permissions", "type": "uint8" },
+      { "internalType": "int96", "name": "flowrateAllowance", "type": "int96" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ISuperToken",
+        "name": "token",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "sender", "type": "address" },
+      { "internalType": "address", "name": "receiver", "type": "address" }
+    ],
+    "name": "getFlowrate",
+    "outputs": [
+      { "internalType": "int96", "name": "flowrate", "type": "int96" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ISuperToken",
+        "name": "token",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "flowOperator", "type": "address" }
+    ],
+    "name": "grantPermissions",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ISuperToken",
+        "name": "token",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "flowOperator", "type": "address" }
+    ],
+    "name": "revokePermissions",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ISuperToken",
+        "name": "token",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "receiver", "type": "address" },
+      { "internalType": "int96", "name": "flowrate", "type": "int96" }
+    ],
+    "name": "setFlowrate",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ISuperToken",
+        "name": "token",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "sender", "type": "address" },
+      { "internalType": "address", "name": "receiver", "type": "address" },
+      { "internalType": "int96", "name": "flowrate", "type": "int96" }
+    ],
+    "name": "setFlowrateFrom",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ISuperToken",
+        "name": "token",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "sender", "type": "address" },
+      { "internalType": "address", "name": "receiver", "type": "address" },
+      { "internalType": "int96", "name": "flowrate", "type": "int96" },
+      { "internalType": "bytes", "name": "userData", "type": "bytes" }
+    ],
+    "name": "updateFlow",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ISuperToken",
+        "name": "token",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "flowOperator", "type": "address" },
+      { "internalType": "uint8", "name": "permissions", "type": "uint8" },
+      { "internalType": "int96", "name": "flowrateAllowance", "type": "int96" }
+    ],
+    "name": "updateFlowOperatorPermissions",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
+
 `;
 
 export const abi = `[
@@ -714,4 +939,4 @@ export const abi = `[
 		"stateMutability": "view",
 		"type": "function"
 	}
-]`
+]`;

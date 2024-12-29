@@ -1,104 +1,30 @@
-import { useState, useEffect, useRef } from "react";
-// import { Framework } from "@superfluid-finance/sdk-core";
+import { useState, useEffect } from "react";
 import { ethers } from "ethers";
-// import web3modal from "web3modal";
-import { address, abi, forwarderAddress, forwarderABI, superTokenAddress } from "../config.js";
+import {
+    address,
+    abi,
+    forwarderAddress,
+    forwarderABI,
+    superTokenAddress,
+} from "../config.js";
 import styles from "../styles/style";
 import { Navbar } from "../components";
-import { useHuddle01, useEventListener } from "@huddle01/react";
-import {
-    useLobby,
-    useAudio,
-    useVideo,
-    usePeers,
-    useRoom,
-} from "@huddle01/react/hooks";
-import { Audio, Video } from "@huddle01/react/components";
+import { useRouter } from 'next/router'
 
 export default function MyClasses() {
+    const router = useRouter()
+
     // const receiverAddress = `0x248F5db296Ae4D318816e72c25c93e620341f621`;
     // const flowRate = `385802469135802`;
 
-    const { initialize, isInitialized } = useHuddle01();
-    const { joinLobby } = useLobby();
-    const {
-        fetchAudioStream,
-        stopAudioStream,
-        produceAudio,
-        stopProducingAudio,
-        stream: micStream,
-        error: micError,
-    } = useAudio();
-    const {
-        fetchVideoStream,
-        stopVideoStream,
-        produceVideo,
-        stopProducingVideo,
-        stream: camStream,
-        error: camError,
-    } = useVideo();
-    const { joinRoom, leaveRoom } = useRoom();
-
-    const videoRef = useRef();
-    const { peers } = usePeers();
-
-    useEventListener("room:joined", () => {
-        console.log("room:joined");
-    });
-    useEventListener("lobby:joined", () => {
-        console.log("lobby:joined");
-        // if (joinRoom.isCallable) {
-        //     joinRoom();
-        // }
-        // runHardware()
-    });
-
-    async function runHardware() {
-        if (fetchVideoStream.isCallable) {
-            fetchVideoStream();
-        }
-        if (fetchAudioStream.isCallable) {
-            fetchAudioStream();
-        }
-    }
-    async function produceHardware() {
-        // if (fetchVideoStream.isCallable) {
-        //     fetchVideoStream();
-        // }
-        if (produceVideo.isCallable) {
-            produceVideo(camStream);
-        }
-        // if (fetchAudioStream.isCallable) {
-        //     fetchAudioStream();
-        // }
-        if (produceAudio.isCallable) {
-            produceAudio(micStream);
-        }
-    }
-
-    async function stopHardware() {
-        if (stopVideoStream.isCallable) {
-            stopVideoStream();
-        }
-        if (stopAudioStream.isCallable) {
-            stopAudioStream();
-        }
-    }
-
-    useEventListener("lobby:cam-on", () => {
-        if (camStream && videoRef.current)
-            videoRef.current.srcObject = camStream;
-    });
-
-    
     const [superToken, setSuperToken] = useState();
     const [gigs, setGigs] = useState([]);
     const [userAddress, setUserAddress] = useState();
 
     async function joinMeeting(prop) {
-        joinLobby(prop.meetingId);
-        await startFlow(prop.host, prop.flowRate);
+        // await startFlow(prop.host, prop.flowRate);
         // await getFlowInfo(prop.host);
+        router.push(`/${prop.meetingId}`);
     }
 
     async function endMeeting(prop) {
@@ -110,25 +36,9 @@ export default function MyClasses() {
     }
 
     useEffect(() => {
-        // sfInitialize();
         fetchUserAddress();
         fetchMyClasses();
-        initialize("KL1r3E1yHfcrRbXsT4mcE-3mK60Yc3YR");
     }, []);
-
-    // async function sfInitialize() {
-    //     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    //     const xsf = await Framework.create({
-    //         chainId: 84532,
-    //         provider,
-    //         resolverAddress: "0xcfA132E353cB4E398080B9700609bb008eceB125" // same for all chains
-    //     });
-    //     const sT = await xsf.loadSuperToken(superTokenAddress);
-    //     setSuperToken(sT);
-
-    //     console.log("ready");
-    //     return sT;
-    // }
 
     async function fetchUserAddress() {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -172,23 +82,22 @@ export default function MyClasses() {
     }
 
     async function startFlow(xReceiverAddress, xFlowRate) {
+        console.log("startFlow", xReceiverAddress, xFlowRate);
         const senderAddress = await fetchUserAddress();
-        if (senderAddress.toUpperCase() == xReceiverAddress.toUpperCase()) return
-        console.log(senderAddress, xReceiverAddress, xFlowRate);
+        if (senderAddress.toUpperCase() == xReceiverAddress.toUpperCase()) {
+            console.log("same address");
+            return;
+        }
 
-        // const xSuperToken = await sfInitialize();
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-        // const modal = new web3modal({
-        //     network: "mumbai",
-        //     cacheProvider: true,
-        // });
-        // const connection = await modal.connect();
-        // const provider = new ethers.providers.Web3Provider(connection);
-        // const signer = provider.getSigner();
+        const forwarderContract = new ethers.Contract(
+            forwarderAddress,
+            forwarderABI,
+            provider.getSigner()
+        );
 
-        const forwarderContract = new ethers.Contract(forwarderAddress, forwarderABI, provider.getSigner());
-
-        const createFlowOperation = forwarderContract.createFlow(
+        const txnResponse = await forwarderContract.createFlow(
             superTokenAddress,
             senderAddress,
             xReceiverAddress,
@@ -196,51 +105,62 @@ export default function MyClasses() {
             "0x"
         );
 
-        const txnResponse = await createFlowOperation.exec(signer);
         const txnReceipt = await txnResponse.wait();
         console.log("started");
-        console.log(txnReceipt)
+        console.log(txnReceipt);
         console.log(
             `https://app.superfluid.finance/dashboard/${xReceiverAddress}`
         );
     }
 
     async function stopFlow(xReceiverAddress) {
+        if (senderAddress.toUpperCase() == xReceiverAddress.toUpperCase()) {
+            console.log("same address");
+            return;
+        }
 
-        if (userAddress?.toUpperCase() == xReceiverAddress?.toUpperCase()) return
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-        // const modal = new web3modal({
-        //     network: "mumbai",
-        //     cacheProvider: true,
-        // });
-        // const connection = await modal.connect();
-        // const provider = new ethers.providers.Web3Provider(connection);
-        // const signer = provider.getSigner();
+        const forwarderContract = new ethers.Contract(
+            forwarderAddress,
+            forwarderABI,
+            provider.getSigner()
+        );
 
-        const forwarderContract = new ethers.Contract(forwarderAddress, forwarderABI, provider.getSigner());
-
-        const flowOp = forwarderContract.deleteFlow(
+        const txnResponse = await forwarderContract.deleteFlow(
             superTokenAddress,
             userAddress,
             xReceiverAddress,
             "0x"
         );
 
-        const txnResponse = await flowOp.exec(signer);
         const txnReceipt = await txnResponse.wait();
         console.log("stopped");
+        console.log(txnReceipt);
     }
 
     async function getFlowInfo(xReceiverAddress) {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        if (userAddress == xReceiverAddress) return
-        
-        const flowInfo = await superToken.getFlow({
-            sender: userAddress,
-            receiver: xReceiverAddress,
-            providerOrSigner: provider,
-        });
-        console.log("flowInfo", flowInfo);
+        const forwarderContract = new ethers.Contract(
+            forwarderAddress,
+            forwarderABI,
+            provider.getSigner()
+        );
+
+        if (senderAddress.toUpperCase() == xReceiverAddress.toUpperCase()) {
+            console.log("same address");
+            return;
+        }
+
+        const txnResponse = await forwarderContract.getFlow(
+            superTokenAddress,
+            userAddress,
+            xReceiverAddress,
+            "0x"
+        );
+
+        const txnReceipt = await txnResponse.wait();
+        console.log("flowInfo", txnReceipt);
     }
 
     function Card(prop) {
@@ -285,26 +205,6 @@ export default function MyClasses() {
                                     >
                                         Launch Meeting
                                     </button>
-                                    {/* <button
-                                        disabled={joinLobby.isCallable}
-                                        onClick={() =>
-                                            joinLobby(prop.meetingId)
-                                        }
-                                        className={`py-4 mt-2 px-12 font-poppins font-medium text-[18px] text-primary bg-blue-gradient rounded-[10px] outline-none ${styles}`}
-                                    >
-                                        
-                                        Join Lobby
-                                    </button> */}
-                                    {/* <TestJoinMeeting
-                                        host={prop.host}
-                                        title={prop.title}
-                                        description={prop.description}
-                                        time={prop.time}
-                                        meetingId={prop.meetingId}
-                                        flowRate={prop.flowRate}
-                                        stringFlowRate={prop.stringFlowRate}
-                                        gigId={prop.gigId}
-                                    /> */}
                                 </div>
                             </div>
                         </div>
@@ -329,9 +229,6 @@ export default function MyClasses() {
                 </div>
             </div>
             <div>
-                {/* <button onClick={startFlow}>start flow</button>
-            <button onClick={stopFlow}>stop flow</button>
-            <button onClick={getFlowInfo}>Get info</button> */}
                 <div className="flex">
                     <div className="pb-20 flex-1">
                         {gigs.map((item, i) => (
@@ -349,90 +246,7 @@ export default function MyClasses() {
                         ))}
                     </div>
                     <div className="flex-1 flex flex-col items-center">
-                        {/* <div className="w-96 h-auto mt-5 mb-5 rounded-lg bg-black-gradient-3 text-white"> */}
-                        <video
-                            ref={videoRef}
-                            autoPlay
-                            muted
-                            className="w-96 h-auto p-8 rounded-lg bg-black-gradient-3 text-black"
-                        ></video>
-                        {/* <div className="w-96 h-96 bg-white text-black"> */}
-                        <div className=" w-96 h-auto mt-5 mb-5 rounded-lg bg-black-gradient-3 text-white ">
-                            {Object.values(peers)
-                                .filter((peer) => peer.cam)
-                                .map((peer) => (
-                                    <>
-                                        {/* role: {peer.role} */}
-                                        <Video
-                                            key={peer.peerId}
-                                            peerId={peer.peerId}
-                                            track={peer.cam}
-                                            debug
-                                            className="h-full w-full"
-                                        />
-                                    </>
-                                ))}
-                            {Object.values(peers)
-                                .filter((peer) => peer.mic)
-                                .map((peer) => (
-                                    <Audio
-                                        key={peer.peerId}
-                                        peerId={peer.peerId}
-                                        track={peer.mic}
-                                    />
-                                ))}
-                        </div>
 
-                        {/* ----------- */}
-
-                        <div className="flex gap-2">
-                            {/* Webcam */} Video :
-                            <button
-                                disabled={!fetchVideoStream.isCallable}
-                                onClick={fetchVideoStream}
-                            >
-                                on
-                            </button>
-                            {/* Webcam */}
-                            <button
-                                disabled={!stopVideoStream.isCallable}
-                                onClick={stopVideoStream}
-                            >
-                                off
-                            </button>
-                        </div>
-
-                        {/* ----------- */}
-
-                        <div className="flex gap-2">
-                            {/* Mic */}Audio :{/* Mic */}
-                            <button
-                                disabled={!fetchAudioStream.isCallable}
-                                onClick={fetchAudioStream}
-                            >
-                                on
-                            </button>
-                            <button
-                                disabled={!stopAudioStream.isCallable}
-                                onClick={stopAudioStream}
-                            >
-                                off
-                            </button>
-                        </div>
-
-                        {/* ----------- */}
-
-                        <div className="flex gap-2">
-                            <button
-                                disabled={!joinRoom.isCallable}
-                                onClick={joinRoom}
-                            >
-                                Join
-                            </button>
-
-                            <button onClick={produceHardware}>Stream</button>
-                        </div>
-                        <button onClick={endMeeting}>End Meeting</button>
                     </div>
                 </div>
             </div>

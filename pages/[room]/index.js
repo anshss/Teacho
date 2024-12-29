@@ -34,7 +34,7 @@ const ShowPeers = () => {
   return (
     <div>
       {peerIds.map((peerId) => {
-        return <RemotePeer peerId={peerId} />;
+        return <RemotePeer key={peerId} peerId={peerId} />;
       })}
     </div>
   );

@@ -97,7 +97,11 @@ export const footerLinks = [
         link: "https://www.hoobank.com/content/",
       },
       {
-        name: "Sarthak Vaish",
+        name: "Abdul Rahman",
+        link: "https://www.hoobank.com/how-it-works/",
+      },
+      {
+        name: "Abhijeet Shukla",
         link: "https://www.hoobank.com/how-it-works/",
       },
       // {
@@ -122,8 +126,12 @@ export const footerLinks = [
         link: "mailto:anshsaxena4190@gmail.com",
       },
       {
-        name: "sarthakvaish184@gmail.com",
-        link: "mailto:sarthakvaish184@gmail.com",
+        name: "abdulr6503@gmail.com",
+        link: "mailto:abdulr6503@gmail.com",
+      },
+      {
+        name: "abhijee0123@gmail.com",
+        link: "mailto:abhijee0123@gmail.com",
       },
       // {
       //   name: "Suggestions",

@@ -6,11 +6,9 @@ If multiple people buy a course from the same lecturer, they will be minted with
 </br>
 
 
-[Deployed Site](https://teacho-superfluid.vercel.app/)
 <br />
 [Demo Video](https://youtu.be/88_QtgqihZU)
 <br />
 [Contract Info](https://sepolia.base.com/address/0xF8E9F063228eb47137101eb863BF3976466AA31F)
 
-# Techo
 # Techo

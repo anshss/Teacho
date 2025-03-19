@@ -1,26 +1,27 @@
-import axios from 'axios';
- 
- 
+import { API } from '@huddle01/server-sdk/api';
+
 const handler = async (req, res) => {
   try {
-    const { data } = await axios.post(
-      'https://api.huddle01.com/api/v1/create-room',
-      {
-        title: 'Huddle01-Test',
-        roomLock: false,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': process.env.NEXT_PUBLIC_HUDDLE_API_KEY,
-        },
-      }
-    );
- 
-    res.status(200).json(data);
+    const api = new API({
+      apiKey: process.env.NEXT_PUBLIC_HUDDLE_API_KEY, // Ensure this is correctly set
+    });
+
+    const newRoom = await api.createRoom({
+      roomLocked: false,  // Allowing access initially
+      metadata: JSON.stringify({
+        title: 'Huddle01 Meeting',
+      }),
+    });
+
+    if (!newRoom || !newRoom.roomId) {
+      return res.status(500).json({ error: "Failed to create room" });
+    }
+
+    res.status(200).json({ roomId: newRoom.roomId }); // Ensure roomId is sent properly
   } catch (error) {
-    res.status(500).json(error);
+    console.error("Error creating room:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
- 
+
 export default handler;

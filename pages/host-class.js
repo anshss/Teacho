@@ -29,22 +29,34 @@ export default function Publish() {
 
     console.log(formInput);
 
+    // ✅ FIXED: Properly fetch `roomId`
+    async function createMeeting() {
+        try {
+            const response = await fetch(`http://localhost:3000/api/create-room`);
+            const resJson = await response.json();
+
+            if (!resJson.roomId) {
+                console.error("Failed to get roomId:", resJson);
+                return null;  // Return null if no roomId is received
+            }
+
+            return resJson.roomId; // Correct way to access roomId
+        } catch (error) {
+            console.error("Error creating meeting:", error);
+            return null;
+        }
+    }
+
+    // ✅ FIXED: Ensure `roomId` is valid before publishing
     async function publish() {
         const meetingId = await createMeeting();
 
-        // const amountInWei = ethers.BigNumber.from(formInput.flowrate);
-        // const monthlyAmount = ethers.utils.formatEther(amountInWei.toString());
-        // const calculatedFlowRate = monthlyAmount * 3600 * 24 * 30;
-        const calculatedFlowRate = 385802469135802;
-
-        if (
-            (!formInput.title,
-            !formInput.description,
-            !formInput.time,
-            !meetingId,
-            !formInput.stringFlowRate)
-        )
+        if (!meetingId || !formInput.title || !formInput.description || !formInput.startTime || !formInput.stringFlowRate) {
+            console.error("Missing required fields or roomId is not generated.");
             return;
+        }
+
+        const calculatedFlowRate = 385802469135802;
 
         const modal = new web3modal({
             network: "mumbai",
@@ -54,36 +66,27 @@ export default function Publish() {
         const provider = new ethers.providers.Web3Provider(connection);
         const signer = provider.getSigner();
         const contract = new ethers.Contract(address, abi, signer);
-        const parseStringFlowRate = ethers.utils.parseEther(
-            formInput.stringFlowRate
-        );
-        const publish = await contract.createGig(
+        const parseStringFlowRate = ethers.utils.parseEther(formInput.stringFlowRate);
+
+        const publishTx = await contract.createGig(
             formInput.title,
             formInput.description,
             formInput.startTime,
-            meetingId,
+            meetingId,  // ✅ Now correctly received
             calculatedFlowRate,
             parseStringFlowRate,
-            {
-                gasLimit: 1000000,
-            }
+            { gasLimit: 1000000 }
         );
-        await publish.wait();
 
-        console.log("published");
+        await publishTx.wait();
+        console.log("Class successfully published!");
     }
 
-    async function createMeeting() {
-      const response = await fetch(`http://localhost:3000/api/create-room`);
-      const resJson = await response.json();
-      const meetingId = resJson.data.roomId;
-      return meetingId;
-    }
-
+    // ✅ FIXED: Debug function to properly check `roomId`
     async function debug() {
-      const roomId = await createMeeting()
-        console.log(roomId);
-    }
+        const roomId = await createMeeting();
+        console.log("Generated Room ID:", roomId);
+    } 
 
     return (
         <div className="bg-primary w-full overflow-hidden min-h-screen">

@@ -27,9 +27,10 @@ export default function Publish() {
         stringFlowRate: "",
     });
 
-    console.log(formInput);
+    // console.log(formInput);
 
     async function publish() {
+        console.log("publishing..");
         const meetingId = await createMeeting();
 
         // const amountInWei = ethers.BigNumber.from(formInput.flowrate);
@@ -74,9 +75,12 @@ export default function Publish() {
     }
 
     async function createMeeting() {
+        console.log("creating meeting..");
       const response = await fetch(`http://localhost:3000/api/create-room`);
       const resJson = await response.json();
+      console.log("resJson", resJson);
       const meetingId = resJson.data.roomId;
+      console.log("meetingId", meetingId);
       return meetingId;
     }
 

@@ -4,7 +4,7 @@ import axios from 'axios';
 const handler = async (req, res) => {
   try {
     const { data } = await axios.post(
-      'https://api.huddle01.com/api/v1/create-room',
+      'https://api.huddle01.com/api/v2/sdk/rooms/create-room',
       {
         title: 'Huddle01-Test',
         roomLock: false,

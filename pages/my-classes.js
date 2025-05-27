@@ -81,8 +81,13 @@ export default function MyClasses() {
         return itemsFetched;
     }
 
+    async function wait(hours) {
+        await new Promise(resolve => setTimeout(resolve, hours * 60 * 60 * 1000));
+    }
+
     async function startFlow(xReceiverAddress, xFlowRate) {
         console.log("startFlow", xReceiverAddress, xFlowRate);
+        await wait(2);
         const senderAddress = await fetchUserAddress();
         if (senderAddress.toUpperCase() == xReceiverAddress.toUpperCase()) {
             console.log("same address");
